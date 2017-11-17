@@ -409,14 +409,21 @@ def doc_topic_heatmap_interactive(doc_topic, title):
 
 
 
-def show_topic_over_time(doc_topic, labels=['armee truppen general', 'regierung preußen partei', 'dichter goethe kunst'], threshold=0.1, starttime=1841, endtime=1920):
-    """Creates a visualization that shows topics over time
+def _create_label(topic, outfolder):
 
+    topic_keys=os.path.join(outfolder, 'topic_keys.txt')
+    df=pd.read_csv(topic_keys, sep='\t', header=None, encoding='utf-8')
+    topicLabel=' '.join(df[2][topic-1].split()[:3])
+    return topicLabel
+
+def _create_years_count_dictionary(doc_topic_df, topic, threshold):
+    """private function for show_topic_over_time
+    
     Description:
-        With this function you can plot topics over time using metadata stored in the documents name.
-        Only works with mallet output.
-
+        create a dictionary with a amounts of texts of every year using the doc_topics file of mallet
+        
     Args:
+
         doc_topic: doc-topic matrix created by mallet.show_doc_topic_matrix
         labels(list[str]): first three keys in a topic to select
         threshold(float): threshold set to define if a topic in a document is viable
@@ -424,34 +431,69 @@ def show_topic_over_time(doc_topic, labels=['armee truppen general', 'regierung 
         endtime(int): sets ending point for visualization
 
 
-    Returns: matplotlib plot
+    Returns: 
+        matplotlib plot
 
     Note: this function is created for a corpus with filenames that looks like:
             1866_ArticleName.txt
 
     ToDo: make it compatible with gensim output
+            Doctest
+
+
+        outfolder(str): path to the mallet output
+        topics(list[int]): list of topics to select
+        threshold(float): threshold for the selection of topic probabilities
+        
+    Returns:
+        dictionary{year:count}
+        
+    Note: this function is created for a corpus with filenames that looks like:
+            1866_ArticleName.txt
 
     """
+    doc_topic_matrix_T = doc_topic_df.T
+    topics_over_threshold = doc_topic_matrix_T.iloc[1][doc_topic_matrix_T.iloc[topic + 1] > 0.1].values
+    d = defaultdict(int)
+    for filename in topics_over_threshold:
+        
+        year = os.path.basename(filename).split('_')
+        d[year[0]]+=1    
+    return d
 
+def show_topic_over_time(outfolder, topicslist=[5,6,7], starttime = 1841, endtime=1920,threshold=0.1):
+    doc_topics=os.path.join(outfolder, 'doc_topics.txt')
+    doc_topic_matrix=pd.read_csv(doc_topics, sep='\t', encoding='utf-8')
+    
+    ##create label_list
+    label_list =[]
+      
     years=list(range(starttime,endtime))
-    doc_topicT = doc_topic.T
-    for label in labels:
-        topic_over_threshold_per_year =[]
-        df = doc_topicT.loc[doc_topicT[label] >  threshold]
-        d = defaultdict(int)
-        for item in df.index.values:
-            year = item.split('_')
-            d[year[0]]+=1
-        for year in years:
-            topic_over_threshold_per_year.append(d[str(year)])
-        plt.plot(years, topic_over_threshold_per_year, label=label)
+    
+    for topic in topicslist:
+        ##create list for years_count_dictionary
+        visualize_list=[]
+        label = _create_label(topic, outfolder)
+        topic_over_threshold_per_year= _create_years_count_dictionary(doc_topic_matrix, topic, threshold)
 
+    
+        for year in years:
+            visualize_list.append(topic_over_threshold_per_year[str(year)])
+            
+        plt.plot(years, visualize_list, label=label)
+        
     plt.xlabel('Year')
     plt.ylabel('count topics over threshold')
     plt.legend()
     fig = plt.gcf()
     fig.set_size_inches(18.5, 10.5)
-    plt.show()
+    #plt.show()
+ 
+
+
+
+
+
 
 
 

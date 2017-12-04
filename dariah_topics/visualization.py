@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 
-"""LDA visualization.
+"""
+Visualizing the Output of LDA Models
+====================================
 
-This module contains functions for LDA visualization provided by `DARIAH-DE`_.
 
-.. _Gensim:
-    https://radimrehurek.com/gensim/index.html
-.. _Mallet:
-    http://mallet.cs.umass.edu/
-.. _DARIAH-DE:
-    https://de.dariah.eu
-    https://github.com/DARIAH-DE
 """
 
 __author__ = "DARIAH-DE"
@@ -24,7 +18,6 @@ import logging
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from wordcloud import WordCloud
 import numpy as np
 import os
 import pandas as pd
@@ -38,56 +31,86 @@ logging.basicConfig(level = logging.ERROR,
 
 def create_doc_topic(corpus, model, doc_labels):
     # Adapted from code by Stefan Pernes
-    """Creates a document-topic data frame.
+    """Creates a document-topic-matrix.
+    
+    Description:
+        With this function you can create a doc-topic-maxtrix for gensim 
+        output. 
 
     Args:
-        Gensim corpus.
-        Gensim model object.
-        List of document labels.
+        corpus (mmCorpus): Gensim corpus.
+        model: Gensim LDA model
+        doc_labels (list): List of document labels.
 
-    Returns: Doc_topic DataFrame
+    Returns: 
+        Doc_topic-matrix as DataFrame
 
     ToDo:
-        Rewrite the first loop to get rid of the necessity to transpose the
-        data frame.'visualization' is not the proper place for this function!
-
+    
+    Example:
+        >>> import gensim
+        >>> corpus = [[(1, 0.5)], []]
+        >>> gensim.corpora.MmCorpus.serialize('/tmp/corpus.mm', corpus)
+        >>> mm = gensim.corpora.MmCorpus('/tmp/corpus.mm')
+        >>> type2id = {0 : "test", 1 : "corpus"}
+        >>> doc_labels = ['doc1', 'doc2']
+        >>> model = gensim.models.LdaModel(corpus=mm, id2word=type2id, num_topics=1)
+        >>> doc_topic = visualization.create_doc_topic(corpus, model, doc_labels)
+        >>> len(doc_topic.T) == 2
+        >>> True
     """
+    log.info("Generating doc_topic_matrix ... ")
     no_of_topics = model.num_topics
     no_of_docs = len(doc_labels)
-    doc_topic = np.zeros((no_of_docs, no_of_topics))
+    doc_topic = np.zeros((no_of_topics, no_of_docs))
 
     for doc, i in zip(corpus, range(no_of_docs)):       # use document bow from corpus
-        topic_dist = model.__getitem__(doc)             # to get topic distribution froom model
+        topic_dist = model.__getitem__(doc)             # to get topic distribution from model
         for topic in topic_dist:                        # topic_dist is a list of tuples
-            doc_topic[i][topic[0]] = topic[1]           # save topic probability
+            doc_topic[topic[0]][i] = topic[1]           # save topic probability
 
     topic_labels = []
     for i in range(no_of_topics):
         topic_terms = [x[0] for x in model.show_topic(i, topn=3)]  # show_topic() returns tuples (word_prob, word)
         topic_labels.append(" ".join(topic_terms))
 
-    doc_topic = pd.DataFrame(doc_topic, index = doc_labels, columns = topic_labels)
-    doc_topic = doc_topic.transpose()
+    doc_topic = pd.DataFrame(doc_topic, index = topic_labels, columns = doc_labels)
 
     return doc_topic
 
 def doc_topic_heatmap(data_frame):
     # Adapted from code by Stefan Pernes and Allen Riddell
     """Plot documnet-topic distribution in a heat map.
+    
+    Description:
+        Use create_doc_topic() to generate a doc-topic
 
     Args:
-        Document-topic data frame.
+        data_frame (DataFrame): Document-topic-matrix.
 
-    Returns: Plot with Heatmap
+    Returns: 
+        Plot with Heatmap
 
     ToDo:
-        Recode to get rid of transpose in the beginning
-
+    
+    Example:
+        >>> import gensim
+        >>> corpus = [[(1, 0.5)], []]
+        >>> gensim.corpora.MmCorpus.serialize('/tmp/corpus.mm', corpus)
+        >>> mm = gensim.corpora.MmCorpus('/tmp/corpus.mm')
+        >>> type2id = {0 : "test", 1 : "corpus"}
+        >>> doc_labels = ['doc1', 'doc2']
+        >>> model = gensim.models.LdaModel(corpus=mm, id2word=type2id, num_topics=1)
+        >>> doc_topic = visualization.create_doc_topic(corpus, model, doc_labels)
+        >>> plot = doc_topic_heatmap(doc_topic)
+        >>> plot.get_fignumns()
+        [1]
     """
-    data_frame = data_frame.transpose().sort_index()
+    log.info("Generating doc_topic_heatmap ... ")
+    data_frame = data_frame.sort_index()
     doc_labels = list(data_frame.index)
     topic_labels = list(data_frame)
-    if len(doc_labels) > 20 or len(topic_labels) > 20: plt.figure(figsize=(20,20))    # if many items, enlarge figure
+    if len(doc_labels) > 20 or len(topic_labels) > 20: plt.figure(figsize=(10,10))    # if many items, enlarge figure
     plt.pcolor(data_frame, norm=None, cmap='Reds')
     plt.yticks(np.arange(data_frame.shape[0])+1.0, doc_labels)
     plt.xticks(np.arange(data_frame.shape[1])+0.5, topic_labels, rotation='90')
@@ -100,14 +123,32 @@ def doc_topic_heatmap(data_frame):
 
 def plot_doc_topics(doc_topic, document_index):
     """Plot topic disctribution in a document.
+    
+    Description:
+        
 
     Args:
         Document-topic data frame.
         Index of the document to be shown.
 
     Returns:
+        Plot.
+        
+    Example:
+        >>> import gensim
+        >>> corpus = [[(1, 0.5)], []]
+        >>> gensim.corpora.MmCorpus.serialize('/tmp/corpus.mm', corpus)
+        >>> mm = gensim.corpora.MmCorpus('/tmp/corpus.mm')
+        >>> type2id = {0 : "test", 1 : "corpus"}
+        >>> doc_labels = ['doc1', 'doc2']
+        >>> model = gensim.models.LdaModel(corpus=mm, id2word=type2id, num_topics=1)
+        >>> doc_topic = visualization.create_doc_topic(corpus, model, doc_labels)
+        >>> plot = visualization.plot_doc_topics(doc_topics, 0)
+        >>> plot.get_fignumns()
+        [1]
 
     """
+    log.info("Calculating topic distribution ... ")
     data = doc_topic[list(doc_topic)[document_index]].copy()
     data = data[data != 0]
     data = data.sort_values()
@@ -122,159 +163,257 @@ def plot_doc_topics(doc_topic, document_index):
     plt.tight_layout()
     return plt
 
-#
-# Work in progress following
-#
-def topicwords_in_df(model):
-    pattern = regex.compile(r'\p{L}+\p{P}?\p{L}+')
-    topics = []
-    index = []
-    for n, topic in enumerate(model.show_topics()):
-        topics.append(pattern.findall(topic[1]))
-        index.append("Topic " + str(n+1))
-    df = pd.DataFrame(topics, index=index, columns=["Key " + str(x+1) for x in range(len(topics))])
-    return df
 
-def show_wordle_for_topic(model, topic_nr, words):
-    """Plot wordle for a specific topic
+try:
+    from wordcloud import WordCloud
 
-    Args:
-        model: Gensim LDA model
-        topic_nr(int): Choose topic
-        words (int): Number of words to show
+    #
+    # Work in progress following
+    #
+    def topicwords_in_df(model):
+        """Read Keywords for each topic
 
-    Note: Function does use wordcloud package -> https://pypi.python.org/pypi/wordcloud
-         pip install wordcloud
+        Args:
+            model: Gensim LDA model
 
-    ToDo: Check if this function should be implemented
+        Note: Work in progress
 
-    """
-    plt.figure()
-    plt.imshow(WordCloud().fit_words(dict(model.show_topic(topic_nr, words))))
-    plt.axis("off")
-    plt.title("Topic #" + str(topic_nr + 1))
-    return plt
+        ToDo: 
+            Check if this function should be implemented 
+            and complete docstring
+        
+        Returns: 
+            Pandas DataFrame
+
+        """
+        pattern = regex.compile(r'\p{L}+\p{P}?\p{L}+')
+        topics = []
+        index = []
+        log.info("Get keywords for topic ...")
+        for n, topic in enumerate(model.show_topics()):
+            topics.append(pattern.findall(topic[1]))
+            index.append("Topic " + str(n+1))
+        df = pd.DataFrame(topics, index=index, columns=["Key " + str(x+1) for x in range(len(topics))])
+        return df
+
+    def show_wordle_for_topic(model, topic_nr, words):
+        """Plot wordle for a specific topic
+
+        Args:
+            model: Gensim LDA model
+            topic_nr(int): Choose topic
+            words (int): Number of words to show
+
+        Note: 
+            Work in progress
+            Function does use wordcloud package -> https://pypi.python.org/pypi/wordcloud
+            pip install wordcloud.
+
+        ToDo: 
+            Check if this function should be implemented.
+             
+        Returns:
+            Plot.
+
+        """
+        plt.figure()
+        plt.imshow(WordCloud().fit_words(dict(model.show_topic(topic_nr, words))))
+        plt.axis("off")
+        plt.title("Topic #" + str(topic_nr + 1))
+        return plt
 
 
-def get_color_scale(word, font_size, position, orientation, font_path, random_state=None):
-    """ Create color scheme for wordle."""
-    return "hsl(245, 58%, 25%)" # Default. Uniform dark blue.
-    #return "hsl(0, 00%, %d%%)" % random.randint(80, 100) # Greys for black background.
-    #return "hsl(221, 65%%, %d%%)" % random.randint(30, 35) # Dark blues for white background
+    def get_color_scale(word, font_size, position, orientation, font_path, random_state=None):
+        """ Create color scheme for wordle.
+        
+        Description:
+            
 
-def get_topicRank(topic, topicRanksFile):
-    #print("getting topic rank.")
-    with open(topicRanksFile, "r") as infile:
-        topicRanks = pd.read_csv(infile, sep=",", index_col=0)
-        rank = int(topicRanks.iloc[topic]["Rank"])
-        return rank
+        Args:
+   
+        Note: 
+            Work in progress
 
-def read_mallet_word_weights(word_weights_file):
-    """Read Mallet word_weigths file
+        ToDo: 
+            Check if this function should be implemented. 
+        
+        Returns:
+        
+        """
+        return "hsl(245, 58%, 25%)" # Default. Uniform dark blue.
+        #return "hsl(0, 00%, %d%%)" % random.randint(80, 100) # Greys for black background.
+        #return "hsl(221, 65%%, %d%%)" % random.randint(30, 35) # Dark blues for white background
 
-    Description:
-        Reads Mallet word_weigths into pandas DataFrame.
+    def get_topicRank(topic, topicRanksFile):
+        """ Add ranking to topics
+        
+        Description:
+            Uses topicRanksFile to add ranking to topics
 
-    Args:
-        word_weigts_file: Word_weights_file created with Mallet
+        Args:
+            topic(int): Number of topic.
+            topicRanksFile(str): Path to topicRanksFile
 
-    Returns: Pandas DataFrame
+        Returns: 
+            Rank of choosen topic
 
-    Note:
+        Note:
+            Work in progress
 
-    ToDo:
+        ToDo:
+            Check if this function should be implemented.
+        
+        """
+        assert topicRanksFile
+        
+        log.info("Add ranking ...")
+        with open(topicRanksFile, "r") as infile:
+            topicRanks = pd.read_csv(infile, sep=",", index_col=0)
+            rank = int(topicRanks.iloc[topic]["Rank"])
+            return rank
 
-    """
-    word_scores = pd.read_table(word_weights_file, header=None, sep="\t")
-    word_scores = word_scores.sort(columns=[0,2], axis=0, ascending=[True, False])
-    word_scores_grouped = word_scores.groupby(0)
-    return word_scores_grouped
+    def read_mallet_word_weights(word_weights_file):
+        """Read Mallet word_weigths file
 
-def get_wordlewords(word_scores_grouped, number_of_top_words, topic_nr):
-    """Transform Mallet output for wordle generation.
+        Description:
+            Reads Mallet word_weigths into pandas DataFrame.
 
-    Description:
-        Get words for wordle.
+        Args:
+            word_weigts_file: Word_weights_file created with Mallet
 
-    Args:
-        word_scores_grouped(DataFrame): Uses read_mallet_word_weights() to get
-            grouped word scores.
-        topic_nr(int): Topic the wordle should be generated for
-        number_of_top_words(int): Number of top words that should be considered
+        Returns: 
+            Pandas DataFrame
 
-    Returns: Words for wordle.
+        Note:
+            Work in progress
 
-    Note:
+        ToDo:
 
-    ToDo:
+        """
+        assert word_weights_file
+        log.info("Get word weights ...")
+        word_scores = pd.read_table(word_weights_file, header=None, sep="\t")
+        word_scores = word_scores.sort(columns=[0,2], axis=0, ascending=[True, False])
+        word_scores_grouped = word_scores.groupby(0)
+        return word_scores_grouped
 
-    """
-    topic_word_scores = word_scores_grouped.get_group(topic_nr)
-    top_topic_word_scores = topic_word_scores.iloc[0:number_of_top_words]
-    topic_words = top_topic_word_scores.loc[:,1].tolist()
-    #word_scores = top_topic_word_scores.loc[:,2].tolist()
-    wordlewords = ""
-    j = 0
-    for word in topic_words:
-        word = word
-        #score = word_scores[j]
-        j += 1
-        wordlewords = wordlewords + ((word + " "))
-    return wordlewords
+    def _get_wordcloudwords(word_scores_grouped, number_of_top_words, topic_nr):
+        """Transform Mallet output for wordcloud generation.
 
-def plot_wordle_from_mallet(word_weights_file,
-                            topic_nr,
-                            number_of_top_words,
-                            outfolder,
-                            dpi):
-    """Generate wordles from Mallet output.
+        Description:
+            Get words for wordcloud.
 
-    Description:
-        This function does use the wordcloud module to plot wordles.
-        Uses read_mallet_word_weigths() and get_wordlewords() to get
-        word_scores and words for wordle.
+        Args:
+            word_scores_grouped(DataFrame): Uses read_mallet_word_weights() to get
+                grouped word scores.
+            topic_nr(int): Topic the wordcloud should be generated for
+            number_of_top_words(int): Number of top words that should be considered
 
-    Args:
-        word_weigts_file: Word_weights_file created with Mallet
-        topic_nr(int): Topic the wordle should be generated for
-        number_of_top_words(int): Number of top words that should be considered
-            for the wordle
-        outfolder(str): Specify path to safe wordle.
-        dpi(int): Set resolution for wordle.
+        Returns: 
+            Words for wordcloud.
 
-    Returns: Plot
+        Note:
+            Work in progress
 
-    Note:
+        ToDo:
 
-    ToDo:
+        """
+        log.info("Transform mallet output for wordcloud ...")
+        topic_word_scores = word_scores_grouped.get_group(topic_nr)
+        top_topic_word_scores = topic_word_scores.iloc[0:number_of_top_words]
+        topic_words = top_topic_word_scores.loc[:,1].tolist()
+        #word_scores = top_topic_word_scores.loc[:,2].tolist()
+        wordcloudwords = ""
+        j = 0
+        for word in topic_words:
+            word = word
+            #score = word_scores[j]
+            j += 1
+            wordcloudwords = wordcloudwords + ((word + " "))
+        return wordcloudwords
 
-    """
+    def plot_wordcloud_from_mallet(word_weights_file,
+                                topic_nr,
+                                number_of_top_words,
+                                outfolder,
+                                dpi):
+        """Generate wordclouds from Mallet output.
 
-    word_scores_grouped = read_mallet_word_weights(word_weights_file)
-    text = get_wordlewords(word_scores_grouped, number_of_top_words, topic_nr)
-    wordcloud = WordCloud(width=600, height=400, background_color="white", margin=4).generate(text)
-    default_colors = wordcloud.to_array()
-    figure_title = "topic "+ str(topic_nr)
-    plt.imshow(default_colors)
-    plt.imshow(wordcloud)
-    plt.title(figure_title, fontsize=30)
-    plt.axis("off")
+        Description:
+            This function does use the wordcloud module to plot wordclouds.
+            Uses read_mallet_word_weigths() and get_wordlewords() to get
+            word_scores and words for wordclouds.
 
-    ## Saving the image file.
-    if not os.path.exists(outfolder):
-        os.makedirs(outfolder)
+        Args:
+            word_weigts_file: Word_weights_file created with Mallet
+            topic_nr(int): Topic the wordclouds should be generated for
+            number_of_top_words(int): Number of top words that should be considered
+                for the wordclouds
+            outfolder(str): Specify path to safe wordclouds.
+            dpi(int): Set resolution for wordclouds.
 
-    figure_filename = "wordle_tp"+"{:03d}".format(topic_nr) + ".png"
-    plt.savefig(outfolder + figure_filename, dpi=dpi)
-    return plt
+        Returns: 
+            Plot
 
-def plot_wordle_from_lda(model, vocab, topic_nr, words, height, width):
-    topic_dist = model.topic_word_[topic_nr]
-    topic_words = np.array(vocab)[np.argsort(topic_dist)][:-words:-1]
-    token_value = {}
-    for token, value in zip(topic_words, topic_dist[:-words:-1]):
-        token_value.update({token: value})
-    return WordCloud(background_color='white', height=height, width=width).fit_words(token_value)
+        Note:
+            Work in progress
+
+        ToDo:
+
+        """
+        assert word_weights_file
+        log.info("Generate wordcloud...")
+        word_scores_grouped = read_mallet_word_weights(word_weights_file)
+        text = _get_wordcloudwords(word_scores_grouped, number_of_top_words, topic_nr)
+        wordcloud = WordCloud(width=600, height=400, background_color="white", margin=4).generate(text)
+        default_colors = wordcloud.to_array()
+        figure_title = "topic "+ str(topic_nr)
+        plt.imshow(default_colors)
+        plt.imshow(wordcloud)
+        plt.title(figure_title, fontsize=30)
+        plt.axis("off")
+
+        ## Saving the image file.
+        if not os.path.exists(outfolder):
+            os.makedirs(outfolder)
+
+        figure_filename = "wordcloud_tp"+"{:03d}".format(topic_nr) + ".png"
+        assert figure_filename
+        plt.savefig(outfolder + figure_filename, dpi=dpi)
+        return plt
+
+    def plot_wordle_from_lda(model, vocab, topic_nr, words, height, width):
+        """ Plot wordle for Gensim.
+        
+        Description:
+            
+
+        Args:
+            model: Gensim lda model.
+            vocab:
+            topic_nr(int): Topic a wordcloud should be generated for.
+            height(int): Height of the plot
+            weight(int): Weight of the plot
+   
+        Note: 
+            Work in progress
+
+        ToDo: 
+            Check if this function should be implemented. 
+        
+        Returns:
+        
+        """
+        log.info("Generate wordcloud...")
+        topic_dist = model.topic_word_[topic_nr]
+        topic_words = np.array(vocab)[np.argsort(topic_dist)][:-words:-1]
+        token_value = {}
+        for token, value in zip(topic_words, topic_dist[:-words:-1]):
+            token_value.update({token: value})
+        return WordCloud(background_color='white', height=height, width=width).fit_words(token_value)
+
+except ImportError as e:
+    log.error('WordCloud functions not available, they require the wordcloud module')
 
 
 def doc_topic_heatmap_interactive(doc_topic, title):
@@ -284,18 +423,20 @@ def doc_topic_heatmap_interactive(doc_topic, title):
         With this function you can plot an interactive doc_topic matrix.
 
     Args:
-        doc_topic: Doc_topic matrix in a DataFrame
-        title(str): Title shown in the plot.
+        doc_topic (DataFrame): Doc_topic matrix in a DataFrame
+        title (str): Title shown in the plot.
 
-    Returns: bokeh plot
+    Returns: 
+        bokeh plot
 
     Note:
 
     ToDo:
+        Doctest
 
     """
     log.info("Importing functions from bokeh ...")
-    try:    
+    try:
         #from ipywidgets import interact
         from bokeh.io import output_notebook
         from bokeh.plotting import figure
@@ -307,7 +448,7 @@ def doc_topic_heatmap_interactive(doc_topic, title):
             BasicTicker,
             ColorBar
             )
-        
+
         output_notebook()
 
         documents = list(doc_topic.columns)
@@ -361,7 +502,7 @@ def doc_topic_heatmap_interactive(doc_topic, title):
              ('Score', '@Score')
              ]
         return p
-        
+
     except:
         log.info("Bokeh could not be imported now using mathplotlib")
         doc_topic_heatmap(doc_topic)
@@ -390,16 +531,18 @@ def show_topic_over_time(doc_topic, labels=['armee truppen general', 'regierung 
         threshold(float): threshold set to define if a topic in a document is viable
         starttime(int): sets starting point for visualization
         endtime(int): sets ending point for visualization
-        
 
-    Returns: matplotlib plot
+
+    Returns: 
+        matplotlib plot
 
     Note: this function is created for a corpus with filenames that looks like:
             1866_ArticleName.txt
 
     ToDo: make it compatible with gensim output
+            Doctest
 
-    """       
+    """
 
     years=list(range(starttime,endtime))
     doc_topicT = doc_topic.T
@@ -413,14 +556,14 @@ def show_topic_over_time(doc_topic, labels=['armee truppen general', 'regierung 
         for year in years:
             topic_over_threshold_per_year.append(d[str(year)])
         plt.plot(years, topic_over_threshold_per_year, label=label)
-                   
+
     plt.xlabel('Year')
     plt.ylabel('count topics over threshold')
     plt.legend()
     fig = plt.gcf()
     fig.set_size_inches(18.5, 10.5)
     plt.show()
-    
 
-    
+
+
 

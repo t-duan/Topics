@@ -4,7 +4,7 @@
 from setuptools import setup, find_packages
 
 PROJECT = 'DARIAH Topic Modelling'
-VERSION = 'frozen'
+VERSION = '1.0'
 AUTHOR = 'DARIAH-DE Wuerzburg Group'
 AUTHOR_EMAIL = 'pielstroem@biozentrum.uni-wuerzburg.de'
 
@@ -33,7 +33,7 @@ setup(
         'build_sphinx': {
             'project': ('setup.py', PROJECT),
             'version': ('setup.py', VERSION),
-            'release': ('setup.py', REVISION),
+            'release': ('setup.py', VERSION),
         }
     }
 )

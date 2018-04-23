@@ -100,6 +100,4 @@ class PlotDocumentTopics:
                                ticker=BasicTicker(desired_num_ticks=len(palette)),
                                label_standoff=6, border_line_color=None, location=(0, 0))
             fig.add_layout(feature, 'right')
-        if self.enable_notebook:
-            self.show(fig, notebook_handle=True)
         return fig

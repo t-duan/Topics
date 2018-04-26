@@ -23,11 +23,11 @@ setup(
     # keywords
     packages=find_packages(exclude=['docs', 'demonstrator', 'grenzboten_sample', 'test', 'tutorial_supplementals']),
     install_requires=[
-        'pandas>=0.19.2',
-        'regex>=2017.01.14',
-        'lda>=1.0.5',
-        'numpy>=1.3',
-        'bokeh>=0.12.6',
+        'pandas==0.22.0',
+        'regex==2017.01.14',
+        'lda==1.0.5',
+        'numpy==1.14.2',
+        'bokeh==0.12.6',
     ],
     command_options={
         'build_sphinx': {

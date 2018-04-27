@@ -27,7 +27,7 @@ setup(
         'regex==2017.01.14',
         'lda==1.0.5',
         'numpy==1.14.2',
-        'bokeh==0.12.6',
+        'bokeh==0.12.7',
     ],
     command_options={
         'build_sphinx': {

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Topics – Easy Topic Modeling in Python &#8212; DARIAH Topic Modelling 0.7.1.dev1 documentation</title>
+    <title>Topics – Easy Topic Modeling in Python &#8212; DARIAH Topic Modeling 1.0.0.dev documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" src="_static/documentation_options.js"></script>
@@ -16,7 +16,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Topics – Easy Topic Modeling in Python" href="IntroducingLda.html" />
+    <link rel="next" title="dariah_topics" href="docs/gen/modules.html" />
     <link rel="prev" title="Welcome to DARIAH Topics’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -29,7 +29,7 @@
     
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">DARIAH Topic Modelling</a></h1>
+<h1 class="logo"><a href="index.html">DARIAH Topic Modeling</a></h1>
 
 
 
@@ -48,9 +48,6 @@
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Topics – Easy Topic Modeling in Python</a></li>
-<li class="toctree-l1"><a class="reference internal" href="IntroducingLda.html">Introduction using lda</a></li>
-<li class="toctree-l1"><a class="reference internal" href="IntroducingGensim.html">Introduction using Gensim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="IntroducingMallet.html">Introduction using MALLET</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/gen/modules.html">API Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/CONTRIBUTING.html">Information for Contributors</a></li>
 </ul>
@@ -60,7 +57,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to DARIAH Topics’s documentation!</a></li>
-      <li>Next: <a href="IntroducingLda.html" title="next chapter">Topics – Easy Topic Modeling in Python</a></li>
+      <li>Next: <a href="docs/gen/modules.html" title="next chapter">dariah_topics</a></li>
   </ul></li>
 </ul>
 </div>
@@ -84,7 +81,7 @@
             
   <div class="section" id="topics-easy-topic-modeling-in-python">
 <span id="topics-easy-topic-modeling-in-python"></span><h1>Topics – Easy Topic Modeling in Python<a class="headerlink" href="#topics-easy-topic-modeling-in-python" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference external" href="http://dev.digital-humanities.de/ci/job/DARIAH-Topics/doclinks/1/">Topics</a> is a Python library for topic modeling. Furthermore, this repository provides a convenient, modular workflow that can be entirely controlled from within a well documented <a class="reference external" href="http://jupyter.org/">Jupyter</a> notebook. Users not yet familiar with programming in Python can test basic topic modeling in a standalone <a class="reference external" href="https://dariah-de.github.io/TopicsExplorer/">GUI demonstrator</a>, which <strong>does not require a Python interpreter or any extra installations</strong>.</p>
+<p><a class="reference external" href="https://dariah-de.github.io/Topics/">Topics</a> is a Python library for topic modeling. Furthermore, this repository provides a convenient, modular workflow that can be entirely controlled from within a well documented <a class="reference external" href="http://jupyter.org/">Jupyter</a> notebook. Users not yet familiar with programming in Python can test basic topic modeling in a standalone <a class="reference external" href="https://dariah-de.github.io/TopicsExplorer/">GUI demonstrator</a>, which <strong>does not require a Python interpreter or any extra installations</strong>.</p>
 <p>At the moment, this library supports three LDA implementations:</p>
 <ul class="simple">
 <li><a class="reference external" href="http://pythonhosted.org/lda/index.html">lda</a>, which is lightweight and provides basic LDA.</li>
@@ -94,19 +91,20 @@
 <div class="section" id="resources">
 <span id="resources"></span><h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference external" href="http://dev.digital-humanities.de/ci/job/DARIAH-Topics/doclinks/1/">Topics website</a></li>
-<li><a class="reference external" href="http://dev.digital-humanities.de/ci/job/DARIAH-Topics/doclinks/1/docs/gen/modules.html">Topics API documentation</a></li>
+<li><a class="reference external" href="https://dariah-de.github.io/Topics/">Topics website</a></li>
+<li><a class="reference external" href="https://dariah-de.github.io/Topics/docs/gen/modules.html">Topics API documentation</a></li>
 <li><a class="reference external" href="https://dh2017.adho.org/abstracts/411/411.pdf">Topics paper</a></li>
 <li><strong><a class="reference external" href="https://github.com/DARIAH-DE/TopicsExplorer/releases/latest">Standalone Demonstrator releases</a></strong></li>
 <li>An introduction to topic modeling using lda</li>
 <li>An introduction to topic modeling using MALLET</li>
 <li>An introduction to topic modeling using Gensim</li>
+<li><a class="reference external" href="notebooks/Visualization.ipynb">A demonstration of all available visualizations</a></li>
 </ul>
 </div>
 <div class="section" id="installation">
 <span id="installation"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>To install the latest stable version of the library <code class="docutils literal notranslate"><span class="pre">dariah_topics</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install git+https://github.com/DARIAH-DE/Topics.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install dariah_topics
 </pre></div>
 </div>
 <p>To install the latest development version:</p>
@@ -168,7 +166,7 @@
 <div class="section" id="troubleshooting">
 <span id="troubleshooting"></span><h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this headline">¶</a></h2>
 <p>If you are confronted with any issues regarding installation or usability, please use <a class="reference external" href="https://github.com/DARIAH-DE/Topics/issues">GitHub issues</a>.</p>
-<p><strong>This library requires Python 3.6 or higher.</strong></p>
+<p><strong>This library requires Python 3.4 or higher.</strong></p>
 <div class="section" id="windows-specific-issues">
 <span id="windows-specific-issues"></span><h3>Windows-specific Issues<a class="headerlink" href="#windows-specific-issues" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -201,7 +199,7 @@
     <div class="clearer"></div>
   </div>
     <div class="footer">
-      &copy;2017, DARIAH-DE Group Würzburg.
+      &copy;2017-2018, DARIAH-DE Group Würzburg.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>

@@ -4,12 +4,12 @@
 from setuptools import setup, find_packages
 
 PROJECT = 'DARIAH Topic Modelling'
-VERSION = '1.0'
+VERSION = '1.1'
 AUTHOR = 'DARIAH-DE Wuerzburg Group'
 AUTHOR_EMAIL = 'pielstroem@biozentrum.uni-wuerzburg.de'
 
 setup(
-    name='dariah_topics',
+    name='dariah_topics_light',
     version=VERSION,
     description=PROJECT,
     # url
@@ -28,6 +28,7 @@ setup(
         'lda==1.0.5',
         'numpy==1.14.2',
         'bokeh==0.12.7',
+        'bounter==1.0.1'
     ],
     command_options={
         'build_sphinx': {

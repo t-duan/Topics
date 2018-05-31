@@ -199,7 +199,12 @@ def _create_small_corpus_model(tokenized_corpus, document_labels):
     document_term_matrix = pd.DataFrame()
     for tokenized_document, document_label in zip(tokenized_corpus, document_labels):
         log.debug("Updating {} in document-term matrix ...".format(document_label))
-        current_document = pd.Series(Counter(tokenized_document))
+        try:
+            counts = bounter(size_mb=4096)
+        except MemoryError:
+            counts = bounter(size_mb=1024)
+        counts.update(tokenized_document)
+        current_document = pd.Series(dict(counts))
         current_document.name = document_label
         document_term_matrix = document_term_matrix.append(current_document)
     document_term_matrix = document_term_matrix.loc[:, document_term_matrix.sum().sort_values(ascending=False).index]

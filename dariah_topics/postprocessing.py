@@ -37,7 +37,7 @@ def show_document_topics(topics, model=None, document_labels=None, doc_topics_fi
     Example:
     """
     index = [' '.join(keys[:num_keys]) for keys in topics.values]
-    return _show_lda_document_topics(model, document_labels, index)
+    return _show_lda_document_topics(model, document_labels, index).round(4)
 
 
 def show_topics(model=None, vocabulary=None, topic_keys_file=None, num_keys=10):

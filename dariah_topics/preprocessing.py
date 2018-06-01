@@ -1,5 +1,4 @@
-from collections import defaultdict
-from bounter import bounter
+from collections import Counter, defaultdict
 import csv
 from itertools import chain
 import os

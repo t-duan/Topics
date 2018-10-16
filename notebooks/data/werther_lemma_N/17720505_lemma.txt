@@ -1,0 +1,12 @@
+Geburtsort
+Meile
+Weg
+Tag
+Tor
+Mutter
+Tod
+Vater
+Ort
+Stadt
+Wilhelm
+Zug
